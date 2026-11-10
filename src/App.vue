@@ -1,4 +1,4 @@
-<!-- App.vue -->
+<!-- App.vue --> 
 <template>
   <!-- Main Wrapper dengan Halaman Full Screen -->
   <main class="page-container">
