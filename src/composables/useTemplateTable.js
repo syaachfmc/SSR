@@ -300,15 +300,17 @@ export function useTemplateTable(props, emit, options = {}) {
 
       table.on('rowClick', (e, row) => {
         const rowData = row.getData();
+
         if (options.store) {
           options.store.selectedRow.value = { ...rowData };
         }
-        const firstColumnID = sheetData.value.columnIDs[4];
-        const firstColumnValue = firstColumnID ? rowData[firstColumnID] : '';
-        const rowID = rowData.__rowID || '';
 
-        emit('row-selected', { value: firstColumnValue, rowID });
+        emit('row-selected', {
+          rowID: rowData.__rowID || '',
+          data: { ...rowData }
+        });
       });
+
     } else {
       await table.setColumns(columns);
       await table.replaceData(result);
@@ -328,7 +330,7 @@ export function useTemplateTable(props, emit, options = {}) {
 
     startProgressSimulation();
 
-  
+
     try {
       const config = props.config;
 
@@ -366,7 +368,16 @@ export function useTemplateTable(props, emit, options = {}) {
       const formattedTableData = buildTableData(result);
       if (options.tableStore) options.tableStore.setTableData(formattedTableData);
 
-      lastUpdated.value = new Date().toLocaleString('id-ID');
+      lastUpdated.value = new Date().toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }).replace(/\./g, ':').replace(/:(\d{2})$/, '.$1');
+
       await renderTable();
       await selectLastRow();
     } catch (error) {
@@ -404,11 +415,17 @@ export function useTemplateTable(props, emit, options = {}) {
     await lastRow.scrollTo();
 
     const rowData = lastRow.getData();
-    if (options.store) options.store.selectedRow.value = { ...rowData };
 
-    const firstColumnID = sheetData.value.columnIDs[4];
-    const firstColumnValue = firstColumnID ? rowData[firstColumnID] : '';
-    emit('row-selected', { value: firstColumnValue, rowID: rowData.__rowID || '' });
+    if (options.store) {
+      options.store.selectedRow.value = { ...rowData };
+    }
+
+    emit('row-selected', {
+      rowID: rowData.__rowID || '',
+      data: { ...rowData }
+    });
+
+
     return rowData;
   }
 
@@ -431,12 +448,15 @@ export function useTemplateTable(props, emit, options = {}) {
     await targetRow.scrollTo();
 
     const rowData = targetRow.getData();
-    if (options.store) options.store.selectedRow.value = { ...rowData };
 
-    const firstColumnID = sheetData.value.columnIDs[4];
-    const firstColumnValue = firstColumnID ? rowData[firstColumnID] : '';
-    emit('row-selected', { value: firstColumnValue, rowID: rowData.__rowID || '' });
-    return rowData;
+    if (options.store) {
+      options.store.selectedRow.value = { ...rowData };
+    }
+
+    emit('row-selected', {
+      rowID: rowData.__rowID || '',
+      data: { ...rowData }
+    }); return rowData;
   }
 
 

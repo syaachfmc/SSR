@@ -1,16 +1,28 @@
-<!-- App.vue --> 
+<!-- App.vue -->
 <template>
   <!-- Main Wrapper dengan Halaman Full Screen -->
   <main class="page-container">
-    <div class="table-card">
-      <!-- Ditambahkan v-if agar tabel dimuat setelah token login tersimpan -->
-      <templateTable v-if="isReady" tableName="Dropdownss" instanceId="ID01" :config="DropdownsConfig"
-        @row-selected="handleRowSelected('ID01')" />
-    </div>
-    <div class="table-card">
-      <!-- Ditambahkan v-if agar tabel dimuat setelah token login tersimpan -->
-      <templateTable v-if="isReady" tableName="Dropdownss" instanceId="ID02" :config="DropdownsConfig"
-        @row-selected="handleRowSelected('ID02')" />
+    <div class="group-container-wrapper">
+      <div class="group-container">
+        <div class="table-card">
+          <templateTable v-if="isReady" tableName="Dropdowns" instanceId="ID01" :config="DropdownsConfig"
+            @row-selected="handleRowSelected('ID01', $event)" />
+
+          <div class="row-id-label">
+            Row ID: <strong>{{ selectedRowID.ID01 || '-' }}</strong>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <templateTable v-if="isReady" tableName="Dropdowns" instanceId="ID02" :config="ShipmentsConfig"
+            @row-selected="handleRowSelected('ID02', $event)" />
+
+          <div class="row-id-label">
+            Row ID: <strong>{{ selectedRowID.ID02 || '-' }}</strong>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -34,12 +46,37 @@ const DropdownsConfig = {
   columnTypeRow: 4,
   dataRange: "B5:Z",
   rowIDColumn: "A",
-  projectID: "18-1206",
-  projectIDColumn: "B"
+  projectID: "any",
+  projectIDColumn: "B",
+  FrozenColumnIndex: ['1'],
+  foreignKey: {}
 };
-function handleRowSelected(id) {
-  console.log("select", id)
+
+const ShipmentsConfig = {
+  webAppUrl: 'https://script.google.com/macros/s/AKfycbyypeLHPZ_emDu3hrF2aYsYjCG6_qitL-RagpKbNcJEHx_N0HlPspULdkyXM1u0PjUM/exec',
+  gsheetID: "1QnTPM7t8dgnboekqkwq1su1ycyRS7BbW1uVj83qrtEo",
+  sheetName: "Shipments",
+  columnIDRow: 1,
+  columnTitleRow: 2,
+  columnTitleDescriptionRow: 3,
+  columnTypeRow: 4,
+  dataRange: "B5:BZ",
+  rowIDColumn: "A",
+  projectID: "18-1206",
+  projectIDColumn: "B",
+  FrozenColumnIndex: ['2'],
+  foreignKey: {}
+};
+
+const selectedRowID = ref({
+  ID01: '',
+  ID02: ''
+});
+
+function handleRowSelected(instanceId, payload) {
+  selectedRowID.value[instanceId] = payload?.rowID || '';
 }
+
 // Menjalankan fungsi tes saat mounted
 onMounted(async () => {
   await testFetchDropdownsVue();
@@ -149,5 +186,32 @@ body,
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   padding: 8px;
   box-sizing: border-box;
+}
+
+.group-container {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.group-container-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+}
+
+.row-id-label {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  margin-top: 4px;
+  font-size: 18px;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.row-id-label strong {
+  color: #1a73e8;
+  font-weight: 600;
 }
 </style>
